@@ -42,6 +42,8 @@ window.onload = function(){
   var left_death = false;
   var right_death = false;
 
+  var bananaSplat = false;
+
   var left_gorilla = new Image();
   var right_gorilla = new Image();
 
@@ -91,7 +93,7 @@ window.onload = function(){
     right_banana.src = 'banana_right.png';
 
     // Banana follows monkey
-    if(left_bananaThrown == false) {
+    if(left_bananaThrown == false && !bananaSplat) {
       left_by = left_y;
     }
 
@@ -122,7 +124,7 @@ window.onload = function(){
     }  
 
     // if left gorilla is hit by right banana, left death!!!
-    if((right_bx == left_x) && (right_by == right_y))
+    if((Math.abs(right_bx - left_x) < 20) && (Math.abs(right_by - left_y) < 40))
     {
       left_death = true;
     }
@@ -135,7 +137,7 @@ window.onload = function(){
     // right gorilla
 
     // Banana follows monkey
-    if(right_bananaThrown == false) {
+    if(right_bananaThrown == false && !bananaSplat) {
       right_by = right_y;
     }
 
@@ -152,7 +154,7 @@ window.onload = function(){
     }
 
     // throw banana!!!
-    if(keys[37] == true) {
+    if(keys[37] == true && !bananaSplat) {
       right_bananaThrown = true;
     } 
 
@@ -163,11 +165,41 @@ window.onload = function(){
         right_bx = canvasWidth - buildingSpace - 60;
         right_bananaThrown = false;
       }
-    }  
+    }
+
+    // if left gorilla is hit by right banana, left death!!!
+    if((Math.abs(left_bx - right_x) < 20) && (Math.abs(left_by - right_y) < 40))
+    {
+      right_death = true;
+    }
+
+    if(right_death) {
+      right_y = right_y + 5;
+      right_x = right_x + 1.4;
+    }
 
 
+    // BANANA SPLAT
 
+    if((Math.abs(right_bx - left_bx)) < 50 && (Math.abs(right_by - left_by) < 50)){
+      if(Math.random() > 0.96)
+      {
+        right_bananaThrown = false;
+        left_bananaThrown = false;
+        bananaSplat = true;
+      }
+    }
 
+    if(bananaSplat) {
+      right_by = right_by + 10;
+      left_by = left_by + 10;
+
+      if(right_by > canvasHeight && left_by > canvasHeight) {
+        bananaSplat = false;
+        right_bx = canvasWidth - buildingSpace - 60;
+        left_bx = buildingSpace;
+      }
+    }
   };
 
   setInterval(draw, 10);
