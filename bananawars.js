@@ -35,8 +35,9 @@ var right_banana = new Image();
 var left_building = new Image();
 var right_building = new Image();
 
+var death_cloud = new Image();
+
 var keys = {};
-var keyText;
 
 window.onkeyup = function(e) { 
   keys[e.keyCode] = false; 
@@ -44,7 +45,6 @@ window.onkeyup = function(e) {
 
 window.onkeydown = function(e) { 
   keys[e.keyCode] = true; 
-  keyText.innerHTML = e.keyCode;
 }
 
 function init() {
@@ -54,19 +54,17 @@ function init() {
   right_gorilla.src = 'gorilla_right.png';
   left_banana.src = 'banana_left.png';
   right_banana.src = 'banana_right.png';
+  death_cloud.src = 'boom.png';
 
   window.requestAnimationFrame(draw);
 }
 
 function draw() {
-  var heightText = document.getElementById("height");
   var canvas = document.getElementById("bananascene");
   var ctx = canvas.getContext("2d");
 
   ctx.globalCompositeOperation = 'destination-under';
-
-  keyText = document.getElementById("key");
-    
+      
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
   ctx.beginPath();
@@ -85,10 +83,19 @@ function draw() {
   ctx.drawImage(right_banana, right_bx, right_by);
 
   if(waitingForRestart) {
+    if(left_death) {
+      ctx.drawImage(death_cloud, left_x, left_y - 100);
+    }
+
+    if(right_death){
+      ctx.drawImage(death_cloud, right_x, right_y - 100);
+    }
+    
+
     if((keys[32] == true))
     {
       left_y = 400;
-      right_y = 400;
+      right_y = 400;    
 
       left_x = buildingSpace - 23;
       right_x = canvasWidth - buildingSpace - 8;
@@ -121,13 +128,11 @@ function draw() {
     // Up
     if(keys[87] == true) {
       if (left_y > 174) { left_y = left_y - 1; }
-      heightText.innerHTML = left_y;
     }
 
     // Down
     if(keys[83] == true) {
       if (left_y < 550) { left_y = left_y + 1; }
-      heightText.innerHTML = left_y;
     }
 
     // throw banana!!!
@@ -154,7 +159,7 @@ function draw() {
       left_y = left_y + 5;
       left_x = left_x - 1.4;
 
-      if (left_y > canvasHeight) {
+      if (left_y > canvasHeight) {        
         waitingForRestart = true;
       }
     }
@@ -169,13 +174,11 @@ function draw() {
     // Up
     if(keys[38] == true) {
       if (right_y > 174) { right_y = right_y - 1; }
-      heightText.innerHTML = right_y;
     }
 
     // Down
     if(keys[40] == true) {
       if (right_y < 550) { right_y = right_y + 1; }
-      heightText.innerHTML = right_y;
     }
 
     // throw banana!!!
