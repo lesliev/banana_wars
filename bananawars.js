@@ -22,6 +22,8 @@ var right_bananaThrown = false;
 
 var left_death = false;
 var right_death = false;
+var boom = false;
+var boom_played = false;
 
 var bananaSplat = false;
 var waitingForRestart = false;
@@ -36,6 +38,7 @@ var left_building = new Image();
 var right_building = new Image();
 
 var death_cloud = new Image();
+var boom_sound = new Audio('boom.mp3');
 
 var keys = {};
 
@@ -82,15 +85,21 @@ function draw() {
   ctx.drawImage(left_banana, left_bx, left_by);
   ctx.drawImage(right_banana, right_bx, right_by);
 
+  if(boom) {
+    boom_sound.play();
+    boom_played = true;
+  }
+
   if(waitingForRestart) {
     if(left_death) {
       ctx.drawImage(death_cloud, left_x, left_y - 100);
+      if(!boom_played) { boom = true; }
     }
 
     if(right_death){
       ctx.drawImage(death_cloud, right_x, right_y - 100);
+      if(!boom_played) { boom = true; }
     }
-    
 
     if((keys[32] == true))
     {
@@ -110,6 +119,9 @@ function draw() {
       right_death = false;
 
       waitingForRestart = false;
+
+      boom = false;
+      boom_played = false;
     }
     else
     {
