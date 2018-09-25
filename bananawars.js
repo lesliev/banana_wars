@@ -1,5 +1,46 @@
+
+var buildingHeight = 200;
+var buildingWidth = 100;
+var canvasHeight = 600;
+var canvasWidth = 1024;
+var buildingSpace = 100;
+
+var left_y = 400;
+var right_y = 400;
+
+var left_x = buildingSpace - 23;
+var right_x = canvasWidth - buildingSpace - 8;
+
+var left_bx = buildingSpace;
+var left_by = 400;
+
+var right_bx = canvasWidth - buildingSpace - 60;
+var right_by = 400;
+
+var left_bananaThrown = false;
+var right_bananaThrown = false;
+
+var left_death = false;
+var right_death = false;
+var boom = false;
+var boom_played = false;
+
+var bananaSplat = false;
+var waitingForRestart = false;
+
+var left_gorilla = new Image();
+var right_gorilla = new Image();
+
+var left_banana = new Image();
+var right_banana = new Image();
+
+var left_building = new Image();
+var right_building = new Image();
+
+var death_cloud = new Image();
+var boom_sound = new Audio('boom.mp3');
+
 var keys = {};
-var keyText;
 
 window.onkeyup = function(e) { 
   keys[e.keyCode] = false; 
@@ -7,90 +48,89 @@ window.onkeyup = function(e) {
 
 window.onkeydown = function(e) { 
   keys[e.keyCode] = true; 
-  keyText.innerHTML = e.keyCode;
 }
 
-window.onload = function(){
-  keyText = document.getElementById("key");
+function init() {
+  left_building.src = 'tower.png';
+  right_building.src = 'tower.png';
+  left_gorilla.src = 'gorilla_left.png';
+  right_gorilla.src = 'gorilla_right.png';
+  left_banana.src = 'banana_left.png';
+  right_banana.src = 'banana_right.png';
+  death_cloud.src = 'boom.png';
 
+  window.requestAnimationFrame(draw);
+}
+
+function draw() {
   var canvas = document.getElementById("bananascene");
-  var heightText = document.getElementById("height");
-  
-
   var ctx = canvas.getContext("2d");
 
-  var buildingHeight = 200;
-  var buildingWidth = 100;
-  var canvasHeight = 600;
-  var canvasWidth = 1024;
-  var buildingSpace = 100;
-  var left_y = 400;
-  var right_y = 400;
+  ctx.globalCompositeOperation = 'destination-under';
+      
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  var left_x = buildingSpace - 23;
-  var right_x = canvasWidth - buildingSpace - 8;
+  ctx.beginPath();
+  ctx.rect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = "#66c2ff";
+  ctx.fill();
+  ctx.closePath();
 
-  var left_bx = buildingSpace;
-  var left_by = 400;
+  ctx.drawImage(left_building, buildingSpace, buildingHeight);
+  ctx.drawImage(right_building, canvasWidth-buildingWidth-buildingSpace, buildingHeight);
 
-  var right_bx = canvasWidth - buildingSpace - 60;
-  var right_by = 400;
+  ctx.drawImage(left_gorilla, left_x, left_y);
+  ctx.drawImage(right_gorilla, right_x, right_y);
 
-  var left_bananaThrown = false;
-  var right_bananaThrown = false;
+  ctx.drawImage(left_banana, left_bx, left_by);
+  ctx.drawImage(right_banana, right_bx, right_by);
 
-  var left_death = false;
-  var right_death = false;
+  if(boom) {
+    boom_sound.play();
+    boom_played = true;
+  }
 
-  var bananaSplat = false;
+  if(waitingForRestart) {
+    if(left_death) {
+      ctx.drawImage(death_cloud, left_x, left_y - 100);
+      if(!boom_played) { boom = true; }
+    }
 
-  var left_gorilla = new Image();
-  var right_gorilla = new Image();
+    if(right_death){
+      ctx.drawImage(death_cloud, right_x, right_y - 100);
+      if(!boom_played) { boom = true; }
+    }
 
-  var left_banana = new Image();
-  var right_banana = new Image();
+    if((keys[32] == true))
+    {
+      left_y = 400;
+      right_y = 400;    
 
-  function draw() {
+      left_x = buildingSpace - 23;
+      right_x = canvasWidth - buildingSpace - 8;
 
-    ctx.beginPath();
-    ctx.rect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle = "blue";
-    ctx.fill();
-    ctx.closePath();
+      left_bx = buildingSpace;
+      left_by = 400;
 
-    ctx.beginPath();
-    ctx.rect(buildingSpace, buildingHeight, buildingWidth, canvasHeight-buildingHeight);
-    ctx.fillStyle = "grey";
-    ctx.fill();
-    ctx.closePath();
+      right_bx = canvasWidth - buildingSpace - 60;
+      right_by = 400;
 
-    ctx.beginPath();
-    ctx.rect(canvasWidth-buildingWidth-buildingSpace, buildingHeight, buildingWidth, canvasHeight-buildingHeight);
-    ctx.fillStyle = "grey";
-    ctx.fill();
-    ctx.closePath();
-    
-    left_gorilla.onload = function () {
-      ctx.drawImage(left_gorilla, left_x, left_y);
-    };
+      left_death = false;
+      right_death = false;
 
-    right_gorilla.onload = function () {
-      ctx.drawImage(right_gorilla, right_x, right_y);
-    };
+      waitingForRestart = false;
 
-    left_banana.onload = function () {
-      ctx.drawImage(left_banana, left_bx, left_by);
-    };
-
-    right_banana.onload = function () {
-      ctx.drawImage(right_banana, right_bx, right_by);
-    };
-
-    left_gorilla.src = 'gorilla_left.png';
-    right_gorilla.src = 'gorilla_right.png';
-
-    left_banana.src = 'banana_left.png';
-    right_banana.src = 'banana_right.png';
+      boom = false;
+      boom_played = false;
+    }
+    else
+    {
+      ctx.font = "32px Georgia";
+      ctx.fillStyle = "white";
+      ctx.fillText("Press Space to restart", (canvasWidth/2)-150, canvasHeight/2);
+      // do nothing
+    }
+  } else {
 
     // Banana follows monkey
     if(left_bananaThrown == false && !bananaSplat) {
@@ -100,13 +140,11 @@ window.onload = function(){
     // Up
     if(keys[87] == true) {
       if (left_y > 174) { left_y = left_y - 1; }
-      heightText.innerHTML = left_y;
     }
 
     // Down
     if(keys[83] == true) {
       if (left_y < 550) { left_y = left_y + 1; }
-      heightText.innerHTML = left_y;
     }
 
     // throw banana!!!
@@ -132,6 +170,10 @@ window.onload = function(){
     if(left_death) {
       left_y = left_y + 5;
       left_x = left_x - 1.4;
+
+      if (left_y > canvasHeight) {        
+        waitingForRestart = true;
+      }
     }
 
     // right gorilla
@@ -144,13 +186,11 @@ window.onload = function(){
     // Up
     if(keys[38] == true) {
       if (right_y > 174) { right_y = right_y - 1; }
-      heightText.innerHTML = right_y;
     }
 
     // Down
     if(keys[40] == true) {
       if (right_y < 550) { right_y = right_y + 1; }
-      heightText.innerHTML = right_y;
     }
 
     // throw banana!!!
@@ -167,7 +207,7 @@ window.onload = function(){
       }
     }
 
-    // if left gorilla is hit by right banana, left death!!!
+    // if right gorilla is hit by left banana, right death!!!
     if((Math.abs(left_bx - right_x) < 20) && (Math.abs(left_by - right_y) < 40))
     {
       right_death = true;
@@ -176,17 +216,20 @@ window.onload = function(){
     if(right_death) {
       right_y = right_y + 5;
       right_x = right_x + 1.4;
-    }
 
+      if (right_y > canvasHeight) {
+        waitingForRestart = true;
+      }
+    }
 
     // BANANA SPLAT
 
-    if((Math.abs(right_bx - left_bx)) < 50 && (Math.abs(right_by - left_by) < 50)){
-      if(Math.random() > 0.96)
-      {
+    if(Math.random() > 0.96) {
+      if((Math.abs(right_bx - left_bx)) < 50 && (Math.abs(right_by - left_by) < 50)){
         right_bananaThrown = false;
         left_bananaThrown = false;
         bananaSplat = true;
+        
       }
     }
 
@@ -200,8 +243,9 @@ window.onload = function(){
         left_bx = buildingSpace;
       }
     }
-  };
+  }
 
-  setInterval(draw, 10);
-
+  window.requestAnimationFrame(draw);
 }
+
+init();
