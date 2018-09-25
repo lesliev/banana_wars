@@ -85,7 +85,7 @@ function draw() {
   ctx.drawImage(left_banana, left_bx, left_by);
   ctx.drawImage(right_banana, right_bx, right_by);
 
-  if(boom) {
+  if(boom && boom_played == false) {
     boom_sound.play();
     boom_played = true;
   }
